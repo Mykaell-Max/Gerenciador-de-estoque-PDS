@@ -17,7 +17,8 @@ Dentro da pasta backend:
 		Windows (PowerShell do Vscode): 
 			Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 			venv\Scripts\Activate.ps1
-			
+			pip install -r .\requirements.txt
+			uvicorn main:app --reload			
 
 Dentro da pasta frontend:
 	Processo normal:
@@ -27,6 +28,8 @@ Dentro da pasta frontend:
 		
 		Windows:
 			Instalar: https://nodejs.org/
+			Baixar a última versão, usando docker, baixe o instalador, não tente executar comandos de terminal.
+
 			nmp install
 			npm run 
 			
