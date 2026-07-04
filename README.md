@@ -15,7 +15,7 @@ Dentro da pasta backend:
 			uvicorn main:app --reload
 
 		Windows (PowerShell do Vscode): 
-			Set-ExecutionPolicy RemoteSigned -Scope CurrenteUser
+			Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 			venv\Scripts\Activate.ps1
 			
 
