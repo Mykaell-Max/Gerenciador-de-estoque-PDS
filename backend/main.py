@@ -2,6 +2,9 @@ from fastapi import FastAPI #Biblioteca que permite a conversa entre back e fron
 from fastapi.middleware.cors import CORSMiddleware #Biblioteca para permitir a conversa entre sites (Front é um site, back é outro)
 from pydantic import BaseModel #Biblioteca para formatar os dados recebidos automaticamente
 import psycopg2 #Biblioteca de conexão com o banco de dados
+from backend.init_db import inicializar_banco
+
+inicializar_banco()
 
 class DadosLogin(BaseModel):
     usuario: str
