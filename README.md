@@ -4,9 +4,13 @@ Gerenciador de estoque para supermercados. Desenvolvido como trabalho final para
 
 Configs para rodar o sistema
 
+
 Instalar Postgres: https://www.postgresql.org/download/ 
+
 Definir a senha do usuários "postgres" como "" (vazia).
+
 Ou mudar no arquivo backend/conexao.py o conteúdo da variável "password" para senha que está usando em seu banco de dados.
+
 
 Instalar NodeJs: https://nodejs.org/
 
