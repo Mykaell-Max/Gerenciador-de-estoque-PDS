@@ -233,12 +233,137 @@ function TelaUsuario(props) {
 }
 
 function TelaEstoque() {
+  const [cod, setCod] = useState("")
+  const [nome, setNome] = useState("")
+  const [desc, setDesc] = useState("")
+  const [lote, setLote] = useState("")
+  const [qtd, setQtd] = useState("")
+  const [message, setMessage] = useState("")
+
+  function alteraCod(evento) {
+    setCod(evento.target.value)
+  }
+
+  function alteraNome(evento) {
+    setNome(evento.target.value)
+  }
+
+  function alteraDesc(evento) {
+    setDesc(evento.target.value)
+  }
+
+  function alteraQtd(evento) {
+    setQtd(evento.target.value)
+  }
+
+  function alteraLote(evento) {
+    setLote(evento.target.value)
+  }
+
+  async function cadastraProduto() {
+    //Validações
+
+    if(cod.trim() == "") {
+      setMessage("Código não pode estar vazio.")
+      return
+    }
+
+    if(cod.length < 5) {
+      setMessage("Código deve ter no mínimo 5 caracteres.")
+      return
+    }
+
+    if(nome.trim() == "") {
+      setMessage("Nome não pode estar vazio.")
+      return
+    }
+
+    if(nome.length < 3) {
+      setMessage("Nome deve ter no mínimo 3 caracteres.")
+      return
+    }
+
+    if(desc.trim() == "") {
+      setMessage("Descrição não pode estar vazia.")
+      return
+    }
+
+    if(lote.trim() == "") {
+      setMessage("Lote não pode estar vazio.")
+      return
+    }
+
+    if(lote.length < 6) {
+      setMessage("Usuário deve ter no mínimo 6 caracteres.")
+      return
+    }
+
+    if(qtd.trim() == "") {
+      setMessage("Quantidade inicial não pode estar vazia.")
+      return
+    }
+
+    const dados = {
+      cod,
+      nome,
+      desc,
+      lote,
+      qtd
+    }
+    const resposta = await fetch("http://127.0.0.1:8000/cadastrarProduto", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(dados)
+    })
+    const dadosResposta = await resposta.json()
+    console.log(dadosResposta)
+    if(dadosResposta.sucess) {
+      setCod("")
+      setNome("")
+      setDesc("")
+      setLote("")
+      setQtd("")
+    } 
+    setMessage(dadosResposta.message)
+  }
 
 
-
+  //Fazer apresentação de produtos depois
   return (
     <>
-      <h1>Está no modo estoque</h1>
+      <h1>Modo: Estoque</h1>
+       <section>
+        <div>
+          <form>
+            <label>Código: </label>
+            <input type="text" value={cod} onChange={alteraCod}/>
+            <br /><br />
+            
+            <label>Nome: </label>
+            <input type="text" value={nome} onChange={alteraNome}/>
+            <br /><br />
+
+            <label>Descrição: </label>
+            <input type="text" value={desc} onChange={alteraDesc}/>
+            <br /><br />
+
+            <label>Lote: </label>
+            <input type="text" value={lote} onChange={alteraLote}/>
+            <br /><br />
+
+            <label>Quantidade Inicial: </label>
+            <input type="text" value={qtd} onChange={alteraQtd}/>
+            <br /><br />
+
+
+            <button type="button" onClick={cadastraProduto}>Cadastrar</button>
+          </form>
+          <hr />
+          <p>{message}</p>
+        </div>
+       </section>
     
     
     

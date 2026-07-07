@@ -34,7 +34,7 @@ ENV/
 # =====================
 # Banco de dados / dumps
 # =====================
-*.sql
+#*.sql
 *.sqlite
 *.db
 

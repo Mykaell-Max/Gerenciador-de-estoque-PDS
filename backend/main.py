@@ -18,6 +18,13 @@ class DadosCadastro(BaseModel):
     senha: str
     tipo: str
 
+class DadosProduto(BaseModel):
+    cod: int 
+    nome: str
+    desc: str
+    lote: int
+    qtd: int
+
 app = FastAPI()
 
 app.add_middleware(
@@ -144,5 +151,74 @@ def realizarCadastro(dados: DadosCadastro):
         "sucess": True,
         "message": "Cadastro realizado com sucesso"
     }
+
+@app.post("/cadastrarProduto")
+def cadastrarProduto(dados: DadosProduto): 
+    #Validações
+    
+    if len(str(dados.cod)) < 5:
+        return {
+            "sucess": False,
+            "message": "Código deve ter no mínimo 5 caracteres."
+        }
+    
+    if dados.nome.strip() == "":
+        return {
+            "sucess": False,
+            "message": "Nome não pode estar vazio."
+        }
+        
+    if len(dados.nome) < 3:
+        return {
+            "sucess": False,
+            "message": "Nome deve ter no mínimo 3 caracteres."
+        }
+
+    if dados.desc.strip() == "":
+        return {
+            "sucess": False,
+            "message": "Descrição não pode estar vazia."
+        }
+    
+    if len(str(dados.lote)) < 6:
+        return {
+            "sucess": False,
+            "message": "Lote deve ter no mínimo 6 caracteres ."
+        }
+
+    if dados.lote < 0:
+        return {
+            "sucess": False,
+            "message": "Lote inválido."
+        }
+    
+    if dados.qtd < 0:
+        return {
+            "sucess": False,
+            "message": "Quantidade inicial inválida."
+        }
+
+    cursor.execute(
+        "SELECT 1 FROM Produto WHERE cod_prod = %s",
+        (dados.cod,)
+    )
+
+    if cursor.fetchone():
+        return {
+            "sucess": False,
+            "message": "Código já cadastrado."
+        }
+
+    cursor.execute(
+        "INSERT INTO Produto(cod_prod, nome, descricao, lote, qtd) VALUES (%s, %s, %s, %s, %s);",
+        (dados.cod, dados.nome, dados.desc, dados.lote, dados.qtd)
+    )
+    conn.commit()
+
+    return {
+        "sucess": True,
+        "message": "Produto cadastrado com sucesso!"
+    }
+
 
 
