@@ -30,3 +30,9 @@ class DadosAtualizarProduto(BaseModel):
 
 class DadosAtualizarRole(BaseModel):
     tipo: str
+
+
+class DadosMovimentacao(BaseModel):
+    cod: int
+    tipo: str
+    qtd: int

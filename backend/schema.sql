@@ -20,6 +20,17 @@ CREATE TABLE IF NOT EXISTS Produto(
 	CONSTRAINT codprodpk PRIMARY KEY(cod_prod)
 );
 
+CREATE TABLE IF NOT EXISTS MovimentacaoEstoque(
+	id SERIAL NOT NULL,
+	cod_prod INT NOT NULL,
+	tipo VARCHAR(10) NOT NULL CHECK (tipo IN ('entrada', 'saida')),
+	quantidade INT NOT NULL,
+	usuario_nome VARCHAR(100) NOT NULL,
+	data_hora TIMESTAMP NOT NULL DEFAULT NOW(),
+	CONSTRAINT movimentacaopk PRIMARY KEY(id),
+	CONSTRAINT movimentacaoprodfk FOREIGN KEY(cod_prod) REFERENCES Produto(cod_prod) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS LogAuditoria(
 	id SERIAL NOT NULL,
 	usuario_nome VARCHAR(100) NOT NULL,

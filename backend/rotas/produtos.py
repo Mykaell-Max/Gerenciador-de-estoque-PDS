@@ -82,3 +82,19 @@ def editarProduto(cod: int, dados: DadosAtualizarProduto, role=requer_role("admi
     conn.commit()
     registrar_log(nome_autor, f"Editou produto '{dados.nome}' (cód: {cod})")
     return {"message": "Produto atualizado com sucesso!"}
+
+
+@router.delete("/produtos/{cod}")
+def removerProduto(cod: int, role=requer_role("admin", "estoque"), nome_autor: str = Depends(get_user_name)):
+    cursor.execute("SELECT nome FROM Produto WHERE cod_prod = %s", (cod,))
+    linha = cursor.fetchone()
+    if linha is None:
+        raise HTTPException(status_code=404, detail="Produto não encontrado.")
+    try:
+        cursor.execute("DELETE FROM Produto WHERE cod_prod = %s", (cod,))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    registrar_log(nome_autor, f"Removeu produto '{linha[0]}' (cód: {cod})")
+    return {"message": "Produto removido com sucesso!"}

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.rotas import auth, usuarios, produtos, logs
+from backend.rotas import auth, usuarios, produtos, logs, movimentacoes
 
 app = FastAPI()
 
@@ -16,3 +16,4 @@ app.include_router(auth.router)
 app.include_router(usuarios.router)
 app.include_router(produtos.router)
 app.include_router(logs.router)
+app.include_router(movimentacoes.router)
