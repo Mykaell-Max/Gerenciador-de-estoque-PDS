@@ -182,11 +182,10 @@ function EditForm({ product, session, onCancel, onSuccess }) {
 
 function ManageTab({ session }) {
   const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(null)
 
   useEffect(() => {
-    setLoading(true)
     api("/produtos", "GET", null, session.role)
       .then(data => setProducts(data.produtos || []))
       .catch(() => setProducts([]))
