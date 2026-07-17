@@ -10,6 +10,7 @@ const TABS = [
   { key: "register", label: "Cadastrar" },
   { key: "manage",   label: "Gerenciar" },
   { key: "movement", label: "Movimentação" },
+  { key: "history",  label: "Histórico" },
 ]
 
 function validarCadastro({ code, name, description, batch, qty }) {
@@ -25,6 +26,15 @@ function validarCadastro({ code, name, description, batch, qty }) {
   if (!qty.trim()) return "Quantidade não pode estar vazia."
   if (isNaN(Number(qty)) || Number(qty) < 0) return "Quantidade não pode ser negativa."
   return null
+}
+
+function centavosParaDisplay(centavos) {
+  return (centavos / 100).toFixed(2).replace('.', ',')
+}
+
+function inputParaCentavos(raw) {
+  const digits = raw.replace(/\D/g, '')
+  return parseInt(digits || '0', 10)
 }
 
 function validarEdicao({ name, description, batch, qty }) {
@@ -45,6 +55,7 @@ function RegisterTab({ session }) {
   const [description, setDescription] = useState("")
   const [batch, setBatch] = useState("")
   const [qty, setQty] = useState("")
+  const [precoCentavos, setPrecoCentavos] = useState(0)
   const [feedback, setFeedback] = useState(null)
 
   async function handleSubmit(e) {
@@ -61,16 +72,17 @@ function RegisterTab({ session }) {
         desc: description,
         lote: Number(batch),
         qtd: Number(qty),
+        preco: precoCentavos / 100,
       }, session.role, session.name)
       setFeedback({ text: data.message, ok: true })
-      setCode(""); setName(""); setDescription(""); setBatch(""); setQty("")
+      setCode(""); setName(""); setDescription(""); setBatch(""); setQty(""); setPrecoCentavos(0)
     } catch (e) {
       setFeedback({ text: e.message, ok: false })
     }
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 max-w-md w-full">
+    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6  w-full">
       <h3 className="text-gray-800 font-medium mb-4">Cadastrar Produto</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Field label="Código">
@@ -90,6 +102,16 @@ function RegisterTab({ session }) {
             <input value={qty} onChange={e => setQty(e.target.value)} type="text" placeholder="0" className={inputCls} />
           </Field>
         </div>
+        <Field label="Preço (R$)">
+          <input
+            value={centavosParaDisplay(precoCentavos)}
+            onChange={e => setPrecoCentavos(inputParaCentavos(e.target.value))}
+            type="text"
+            inputMode="numeric"
+            placeholder="0,00"
+            className={inputCls}
+          />
+        </Field>
         {feedback && <Feedback ok={feedback.ok} text={feedback.text} />}
         <button type="submit" className={btnPrimary}>Cadastrar Produto</button>
       </form>
@@ -102,6 +124,7 @@ function EditForm({ product, session, onCancel, onSuccess }) {
   const [description, setDescription] = useState(product.desc)
   const [batch, setBatch] = useState(String(product.lote))
   const [qty, setQty] = useState(String(product.qtd))
+  const [precoCentavos, setPrecoCentavos] = useState(Math.round((product.preco ?? 0) * 100))
   const [feedback, setFeedback] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -119,6 +142,7 @@ function EditForm({ product, session, onCancel, onSuccess }) {
         desc: description,
         lote: Number(batch),
         qtd: Number(qty),
+        preco: precoCentavos / 100,
       }, session.role, session.name)
       setFeedback({ text: data.message, ok: true })
       setTimeout(onSuccess, 1200)
@@ -130,7 +154,7 @@ function EditForm({ product, session, onCancel, onSuccess }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 max-w-md w-full">
+    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6  w-full">
       <div className="flex items-center gap-3 mb-4">
         <button
           type="button"
@@ -163,6 +187,15 @@ function EditForm({ product, session, onCancel, onSuccess }) {
             <input value={qty} onChange={e => setQty(e.target.value)} type="text" className={inputCls} />
           </Field>
         </div>
+        <Field label="Preço (R$)">
+          <input
+            value={centavosParaDisplay(precoCentavos)}
+            onChange={e => setPrecoCentavos(inputParaCentavos(e.target.value))}
+            type="text"
+            inputMode="numeric"
+            className={inputCls}
+          />
+        </Field>
         {feedback && <Feedback ok={feedback.ok} text={feedback.text} />}
         <div className="flex gap-3">
           <button
@@ -313,8 +346,6 @@ function ManageTab({ session }) {
 
 function MovementTab({ session }) {
   const [products, setProducts] = useState([])
-  const [movements, setMovements] = useState([])
-  const [loading, setLoading] = useState(true)
   const [cod, setCod] = useState("")
   const [tipo, setTipo] = useState("entrada")
   const [qty, setQty] = useState("")
@@ -322,24 +353,10 @@ function MovementTab({ session }) {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    loadAll()
+    api("/produtos", "GET", null, session.role)
+      .then(d => setProducts(d.produtos || []))
+      .catch(() => {})
   }, [])
-
-  async function loadAll() {
-    setLoading(true)
-    try {
-      const [produtosData, movData] = await Promise.all([
-        api("/produtos", "GET", null, session.role),
-        api("/movimentacoes", "GET", null, session.role),
-      ])
-      setProducts(produtosData.produtos || [])
-      setMovements(movData.movimentacoes || [])
-    } catch {
-      setProducts([]); setMovements([])
-    } finally {
-      setLoading(false)
-    }
-  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -360,7 +377,6 @@ function MovementTab({ session }) {
       }, session.role, session.name)
       setFeedback({ text: data.message, ok: true })
       setQty("")
-      loadAll()
     } catch (e) {
       setFeedback({ text: e.message, ok: false })
     } finally {
@@ -369,92 +385,198 @@ function MovementTab({ session }) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 max-w-md w-full">
-        <h3 className="text-gray-800 font-medium mb-4">Registrar Movimentação</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Field label="Produto">
-            <select value={cod} onChange={e => setCod(e.target.value)} className={inputCls}>
-              <option value="">Selecione um produto</option>
-              {products.map(p => (
-                <option key={p.cod} value={p.cod}>{p.cod} - {p.nome} (qtd: {p.qtd})</option>
-              ))}
+    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 w-full">
+      <h3 className="text-gray-800 font-medium mb-4">Registrar Movimentação</h3>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Field label="Produto">
+          <select value={cod} onChange={e => setCod(e.target.value)} className={inputCls}>
+            <option value="">Selecione um produto</option>
+            {products.map(p => (
+              <option key={p.cod} value={p.cod}>{p.cod} - {p.nome} (qtd: {p.qtd})</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Tipo de Movimentação">
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setTipo("entrada")}
+              className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
+                tipo === "entrada" ? "bg-green-50 border-green-300 text-green-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              <ArrowDownCircle className="w-4 h-4" />
+              Entrada
+            </button>
+            <button
+              type="button"
+              onClick={() => setTipo("saida")}
+              className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
+                tipo === "saida" ? "bg-red-50 border-red-300 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              <ArrowUpCircle className="w-4 h-4" />
+              Saída
+            </button>
+          </div>
+        </Field>
+        <Field label="Quantidade">
+          <input value={qty} onChange={e => setQty(e.target.value)} type="text" placeholder="0" className={inputCls} />
+        </Field>
+        {feedback && <Feedback ok={feedback.ok} text={feedback.text} />}
+        <button type="submit" disabled={submitting} className={btnPrimary}>
+          {submitting ? "Registrando..." : "Registrar Movimentação"}
+        </button>
+      </form>
+    </div>
+  )
+}
+
+
+function HistoryTab({ session }) {
+  const [movements, setMovements] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [filtCod, setFiltCod] = useState("")
+  const [filtUsuario, setFiltUsuario] = useState("")
+  const [filtTipo, setFiltTipo] = useState("")
+  const [filtDataInicio, setFiltDataInicio] = useState("")
+  const [filtDataFim, setFiltDataFim] = useState("")
+  const [pagina, setPagina] = useState(1)
+  const [total, setTotal] = useState(0)
+  const POR_PAGINA = 20
+
+  useEffect(() => {
+    loadMovements()
+  }, [pagina])
+
+  async function loadMovements() {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({ pagina, por_pagina: POR_PAGINA })
+      if (filtCod) params.set("cod_prod", filtCod)
+      if (filtUsuario) params.set("usuario", filtUsuario)
+      if (filtTipo) params.set("tipo", filtTipo)
+      if (filtDataInicio) params.set("data_inicio", filtDataInicio)
+      if (filtDataFim) params.set("data_fim", filtDataFim)
+      const data = await api(`/movimentacoes?${params}`, "GET", null, session.role)
+      setMovements(data.movimentacoes || [])
+      setTotal(data.total || 0)
+    } catch {
+      setMovements([]); setTotal(0)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleFiltrar(e) {
+    e.preventDefault()
+    setPagina(1)
+    loadMovements()
+  }
+
+  function handleLimpar() {
+    setFiltCod(""); setFiltUsuario(""); setFiltTipo("")
+    setFiltDataInicio(""); setFiltDataFim(""); setPagina(1)
+  }
+
+  const totalPaginas = Math.ceil(total / POR_PAGINA)
+
+  return (
+    <div className="space-y-4">
+      <form onSubmit={handleFiltrar} className="bg-white rounded-2xl border border-gray-200 p-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <Field label="Produto (código)">
+            <input value={filtCod} onChange={e => setFiltCod(e.target.value)} type="text" placeholder="Todos" className={inputCls} />
+          </Field>
+          <Field label="Usuário">
+            <input value={filtUsuario} onChange={e => setFiltUsuario(e.target.value)} type="text" placeholder="Todos" className={inputCls} />
+          </Field>
+          <Field label="Tipo">
+            <select value={filtTipo} onChange={e => setFiltTipo(e.target.value)} className={inputCls}>
+              <option value="">Todos</option>
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
             </select>
           </Field>
-          <Field label="Tipo de Movimentação">
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setTipo("entrada")}
-                className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
-                  tipo === "entrada" ? "bg-green-50 border-green-300 text-green-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <ArrowDownCircle className="w-4 h-4" />
-                Entrada
-              </button>
-              <button
-                type="button"
-                onClick={() => setTipo("saida")}
-                className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border transition-all ${
-                  tipo === "saida" ? "bg-red-50 border-red-300 text-red-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <ArrowUpCircle className="w-4 h-4" />
-                Saída
-              </button>
-            </div>
+          <Field label="Data início">
+            <input value={filtDataInicio} onChange={e => setFiltDataInicio(e.target.value)} type="date" className={inputCls} />
           </Field>
-          <Field label="Quantidade">
-            <input value={qty} onChange={e => setQty(e.target.value)} type="text" placeholder="0" className={inputCls} />
+          <Field label="Data fim">
+            <input value={filtDataFim} onChange={e => setFiltDataFim(e.target.value)} type="date" className={inputCls} />
           </Field>
-          {feedback && <Feedback ok={feedback.ok} text={feedback.text} />}
-          <button type="submit" disabled={submitting} className={btnPrimary}>
-            {submitting ? "Registrando..." : "Registrar Movimentação"}
-          </button>
-        </form>
+          <div className="flex items-end gap-2">
+            <button type="submit" className="flex-1 py-2.5 rounded-xl bg-[#030213] text-white text-sm font-medium hover:bg-[#030213]/90 transition-all">
+              Filtrar
+            </button>
+            <button type="button" onClick={handleLimpar} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-all">
+              Limpar
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        {loading ? (
+          <div className="p-8 text-center text-gray-400 text-sm">Carregando...</div>
+        ) : movements.length === 0 ? (
+          <div className="p-8 text-center text-gray-400 text-sm">Nenhuma movimentação encontrada.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[700px]">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  {["Data/Hora", "Produto", "Tipo", "Qtd.", "Est. Anterior", "Est. Posterior", "Usuário"].map(h => (
+                    <th key={h} className="text-left px-4 py-3 text-gray-600 font-medium whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {movements.map(m => (
+                  <tr key={m.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{new Date(m.data_hora).toLocaleString('pt-BR')}</td>
+                    <td className="px-4 py-3 text-gray-900 font-medium whitespace-nowrap">{m.cod} - {m.nome}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${
+                        m.tipo === "entrada" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                      }`}>
+                        {m.tipo === "entrada" ? <ArrowDownCircle className="w-3.5 h-3.5" /> : <ArrowUpCircle className="w-3.5 h-3.5" />}
+                        {m.tipo === "entrada" ? "Entrada" : "Saída"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.qtd}</td>
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.estoque_anterior ?? "—"}</td>
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.estoque_posterior ?? "—"}</td>
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.usuario}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      <div>
-        <h3 className="text-gray-800 font-medium mb-3">Histórico de Movimentações</h3>
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          {loading ? (
-            <div className="p-8 text-center text-gray-400 text-sm">Carregando...</div>
-          ) : movements.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">Nenhuma movimentação registrada.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm min-w-[540px]">
-                <thead className="bg-gray-50 border-b border-gray-100">
-                  <tr>
-                    {["Data/Hora", "Produto", "Tipo", "Qtd.", "Usuário"].map(h => (
-                      <th key={h} className="text-left px-4 py-3 text-gray-600 font-medium whitespace-nowrap">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {movements.map(m => (
-                    <tr key={m.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{new Date(m.data_hora).toLocaleString('pt-BR')}</td>
-                      <td className="px-4 py-3 text-gray-900 font-medium whitespace-nowrap">{m.cod} - {m.nome}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${
-                          m.tipo === "entrada" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-                        }`}>
-                          {m.tipo === "entrada" ? <ArrowDownCircle className="w-3.5 h-3.5" /> : <ArrowUpCircle className="w-3.5 h-3.5" />}
-                          {m.tipo === "entrada" ? "Entrada" : "Saída"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.qtd}</td>
-                      <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{m.usuario}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+      {totalPaginas > 1 && (
+        <div className="flex items-center justify-between text-sm text-gray-600">
+          <span>{total} registros</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPagina(p => Math.max(1, p - 1))}
+              disabled={pagina === 1}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+            >
+              Anterior
+            </button>
+            <span className="px-3 py-1.5">{pagina} / {totalPaginas}</span>
+            <button
+              onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
+              disabled={pagina === totalPaginas}
+              className="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+            >
+              Próxima
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
@@ -486,6 +608,7 @@ export default function StockScreen({ session }) {
       {activeTab === "register" && <RegisterTab session={session} />}
       {activeTab === "manage"   && <ManageTab session={session} />}
       {activeTab === "movement" && <MovementTab session={session} />}
+      {activeTab === "history"  && <HistoryTab session={session} />}
     </div>
   )
 }

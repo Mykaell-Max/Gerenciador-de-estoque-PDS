@@ -8,7 +8,7 @@ export default function MobileDrawer({ session, activeTab, onNavigate, onClose }
 
   return (
     <div className="fixed inset-0 z-50 md:hidden">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-pointer" onClick={onClose} />
       <aside className="absolute left-0 top-0 h-full w-64 bg-white shadow-2xl flex flex-col">
 
         <div className="flex items-center justify-between px-4 py-4 bg-[#030213]">

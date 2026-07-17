@@ -24,5 +24,19 @@ def inicializar_banco():
         codigo_sql = arquivo.read()
     cursor.execute(codigo_sql)
     conn.commit()
+
+    import bcrypt
+    hashed = bcrypt.hashpw("PDS20261".encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    cursor.execute(
+        """
+        INSERT INTO Banco.Usuario(nome, senha, email, tipo, data_inicio)
+        VALUES (%s, %s, %s, %s, %s)
+        ON CONFLICT(nome) DO UPDATE SET senha = EXCLUDED.senha
+        WHERE Banco.Usuario.senha NOT LIKE '$2b$%%'
+        """,
+        ("admin", hashed, "trabalhopdsufu@gmail.com", "admin", "2026-07-01")
+    )
+    conn.commit()
+
     cursor.close()
     conn.close()
