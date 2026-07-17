@@ -51,9 +51,14 @@ export default function UsersScreen({ session }) {
 
   async function loadUsers() {
     setLoadingUsers(true)
-    const data = await api("/usuarios", "GET", null, session.role)
-    setUsers(data.usuarios || [])
-    setLoadingUsers(false)
+    try {
+      const data = await api("/usuarios", "GET", null, session.role)
+      setUsers(data.usuarios || [])
+    } catch {
+      setUsers([])
+    } finally {
+      setLoadingUsers(false)
+    }
   }
 
   async function updateRole(id, newRole) {

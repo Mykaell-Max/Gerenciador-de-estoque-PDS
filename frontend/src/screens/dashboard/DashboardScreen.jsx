@@ -7,16 +7,13 @@ import { Lock, Package, TrendingUp, ShoppingBag, AlertTriangle } from 'lucide-re
 import { ROLE_META } from '../../constants/roles'
 import { canAccess } from '../../services/rbac'
 import { api } from '../../services/api'
+import { formatBRL } from '../../utils/format'
 
 const CARDS = [
   { key: "estoque",  title: "Estoque",  desc: "Cadastrar e consultar produtos.",   roles: ["admin", "estoque"] },
   { key: "caixa",    title: "Caixa",    desc: "Operações de venda e saída.",        roles: ["admin", "caixa"] },
   { key: "usuarios", title: "Usuários", desc: "Cadastrar e gerenciar permissões.",  roles: ["admin"] },
 ]
-
-function formatBRL(v) {
-  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
 
 function formatDia(str) {
   const [, m, d] = str.split('-')

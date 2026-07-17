@@ -5,6 +5,7 @@ import Field from '../../components/Field'
 import Feedback from '../../components/Feedback'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import { inputCls, btnPrimary } from '../../styles/classes'
+import { formatBRL } from '../../utils/format'
 
 const TABS = [
   { key: "venda",    label: "Registrar Venda" },
@@ -17,10 +18,6 @@ const FORMA_PAGAMENTO = [
   { value: "debito",   label: "Cartão de Débito" },
   { value: "pix",      label: "PIX" },
 ]
-
-function formatBRL(valor) {
-  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
 
 function Comprovante({ venda, operador, onFechar }) {
   function handlePrint() { window.print() }

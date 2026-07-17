@@ -23,7 +23,6 @@ def realizarLogin(dados: DadosLogin, db=Depends(get_db)):
     bloqueado = linha[3]
     data_desbloqueio = linha[5]
     if bloqueado:
-        from datetime import date
         if data_desbloqueio is None or data_desbloqueio > date.today():
             motivo = linha[4] or "Sem motivo informado."
             desbloqueio_str = str(data_desbloqueio) if data_desbloqueio else "indefinido"
