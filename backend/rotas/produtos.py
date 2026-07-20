@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from backend.models import DadosProduto, DadosAtualizarProduto
-from backend.db import conn, cursor
-from backend.dependencias import requer_role, get_user_name, registrar_log
+from backend.dependencias import get_db, requer_role, get_user_name, registrar_log
 
 router = APIRouter()
 
 
 @router.post("/cadastrarProduto")
-def cadastrarProduto(dados: DadosProduto, role=requer_role("admin", "estoque"), nome_autor: str = Depends(get_user_name)):
+def cadastrarProduto(dados: DadosProduto, role=requer_role("admin", "estoque"), nome_autor: str = Depends(get_user_name), db=Depends(get_db)):
+    conn, cursor = db
     if len(str(dados.cod)) < 5:
         raise HTTPException(status_code=400, detail="Código deve ter no mínimo 5 dígitos.")
     if dados.nome.strip() == "":
@@ -26,8 +26,8 @@ def cadastrarProduto(dados: DadosProduto, role=requer_role("admin", "estoque"), 
     if cursor.fetchone():
         raise HTTPException(status_code=409, detail="Código já cadastrado.")
     cursor.execute(
-        "INSERT INTO Produto(cod_prod, nome, descricao, lote, qtd) VALUES (%s, %s, %s, %s, %s)",
-        (dados.cod, dados.nome, dados.desc, dados.lote, dados.qtd)
+        "INSERT INTO Produto(cod_prod, nome, descricao, lote, qtd, preco) VALUES (%s, %s, %s, %s, %s, %s)",
+        (dados.cod, dados.nome, dados.desc, dados.lote, dados.qtd, dados.preco)
     )
     conn.commit()
     registrar_log(nome_autor, f"Cadastrou produto '{dados.nome}' (cód: {dados.cod})")
@@ -35,31 +35,50 @@ def cadastrarProduto(dados: DadosProduto, role=requer_role("admin", "estoque"), 
 
 
 @router.get("/produtos")
-def listarProdutos(role=requer_role("admin", "estoque")):
-    cursor.execute("SELECT cod_prod, nome, descricao, lote, qtd FROM Produto ORDER BY cod_prod")
+def listarProdutos(role=requer_role("admin", "estoque", "caixa"), db=Depends(get_db)):
+    conn, cursor = db
+    cursor.execute("SELECT cod_prod, nome, descricao, lote, qtd, preco FROM Produto ORDER BY cod_prod")
     linhas = cursor.fetchall()
     return {
         "produtos": [
-            {"cod": l[0], "nome": l[1], "desc": l[2], "lote": l[3], "qtd": l[4]}
+            {"cod": l[0], "nome": l[1], "desc": l[2], "lote": l[3], "qtd": l[4], "preco": float(l[5] or 0)}
+            for l in linhas
+        ]
+    }
+
+
+@router.get("/produtos/buscar")
+def buscarProdutos(q: str = "", role=requer_role("admin", "estoque", "caixa"), db=Depends(get_db)):
+    conn, cursor = db
+    cursor.execute(
+        "SELECT cod_prod, nome, descricao, lote, qtd, preco FROM Produto WHERE nome ILIKE %s OR CAST(cod_prod AS TEXT) LIKE %s ORDER BY nome LIMIT 20",
+        (f"%{q}%", f"%{q}%")
+    )
+    linhas = cursor.fetchall()
+    return {
+        "produtos": [
+            {"cod": l[0], "nome": l[1], "desc": l[2], "lote": l[3], "qtd": l[4], "preco": float(l[5] or 0)}
             for l in linhas
         ]
     }
 
 
 @router.get("/produtos/{cod}")
-def buscarProduto(cod: int, role=requer_role("admin", "estoque")):
+def buscarProduto(cod: int, role=requer_role("admin", "estoque", "caixa"), db=Depends(get_db)):
+    conn, cursor = db
     cursor.execute(
-        "SELECT cod_prod, nome, descricao, lote, qtd FROM Produto WHERE cod_prod = %s",
+        "SELECT cod_prod, nome, descricao, lote, qtd, preco FROM Produto WHERE cod_prod = %s",
         (cod,)
     )
     linha = cursor.fetchone()
     if linha is None:
         raise HTTPException(status_code=404, detail="Produto não encontrado.")
-    return {"cod": linha[0], "nome": linha[1], "desc": linha[2], "lote": linha[3], "qtd": linha[4]}
+    return {"cod": linha[0], "nome": linha[1], "desc": linha[2], "lote": linha[3], "qtd": linha[4], "preco": float(linha[5] or 0)}
 
 
 @router.put("/produtos/{cod}")
-def editarProduto(cod: int, dados: DadosAtualizarProduto, role=requer_role("admin", "estoque"), nome_autor: str = Depends(get_user_name)):
+def editarProduto(cod: int, dados: DadosAtualizarProduto, role=requer_role("admin", "estoque"), nome_autor: str = Depends(get_user_name), db=Depends(get_db)):
+    conn, cursor = db
     if dados.nome.strip() == "":
         raise HTTPException(status_code=400, detail="Nome não pode estar vazio.")
     if len(dados.nome) < 3:
@@ -76,8 +95,8 @@ def editarProduto(cod: int, dados: DadosAtualizarProduto, role=requer_role("admi
     if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Produto não encontrado.")
     cursor.execute(
-        "UPDATE Produto SET nome = %s, descricao = %s, lote = %s, qtd = %s WHERE cod_prod = %s",
-        (dados.nome, dados.desc, dados.lote, dados.qtd, cod)
+        "UPDATE Produto SET nome = %s, descricao = %s, lote = %s, qtd = %s, preco = %s WHERE cod_prod = %s",
+        (dados.nome, dados.desc, dados.lote, dados.qtd, dados.preco, cod)
     )
     conn.commit()
     registrar_log(nome_autor, f"Editou produto '{dados.nome}' (cód: {cod})")
@@ -85,7 +104,8 @@ def editarProduto(cod: int, dados: DadosAtualizarProduto, role=requer_role("admi
 
 
 @router.delete("/produtos/{cod}")
-def removerProduto(cod: int, role=requer_role("admin", "estoque"), nome_autor: str = Depends(get_user_name)):
+def removerProduto(cod: int, role=requer_role("admin", "estoque"), nome_autor: str = Depends(get_user_name), db=Depends(get_db)):
+    conn, cursor = db
     cursor.execute("SELECT nome FROM Produto WHERE cod_prod = %s", (cod,))
     linha = cursor.fetchone()
     if linha is None:

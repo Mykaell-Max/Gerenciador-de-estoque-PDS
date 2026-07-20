@@ -3,12 +3,33 @@ import LoginScreen from './screens/login/LoginScreen'
 import RegisterScreen from './screens/register/RegisterScreen'
 import Dashboard from './screens/dashboard/Dashboard'
 
+const SESSION_KEY = 'estoque_session'
+
+function loadSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
 export default function App() {
   const [screen, setScreen] = useState("login")
-  const [session, setSession] = useState(null)
+  const [session, setSession] = useState(loadSession)
+
+  function handleLogin(data) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data))
+    setSession(data)
+  }
+
+  function handleLogout() {
+    localStorage.removeItem(SESSION_KEY)
+    setSession(null)
+  }
 
   if (session) {
-    return <Dashboard session={session} onLogout={() => setSession(null)} />
+    return <Dashboard session={session} onLogout={handleLogout} />
   }
 
   if (screen === "register") {
@@ -22,7 +43,7 @@ export default function App() {
 
   return (
     <LoginScreen
-      onLogin={setSession}
+      onLogin={handleLogin}
       onRegister={() => setScreen("register")}
     />
   )
