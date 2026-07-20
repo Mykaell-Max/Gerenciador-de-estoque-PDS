@@ -18,12 +18,21 @@ def realizarLogin(dados: DadosLogin, db=Depends(get_db)):
         (dados.usuario,)
     )
     linha = cursor.fetchone()
-    if linha is None or not verificar_senha(dados.senha, linha[1]):
+    if linha is None:
+        raise HTTPException(status_code=401, detail="Usuário inexistente ou senha incorreta.")
+    try:
+        senha_ok = verificar_senha(dados.senha, linha[1])
+    except Exception:
+        senha_ok = False
+    if not senha_ok:
         raise HTTPException(status_code=401, detail="Usuário inexistente ou senha incorreta.")
     bloqueado = linha[3]
     data_desbloqueio = linha[5]
     if bloqueado:
-        if data_desbloqueio is None or data_desbloqueio > date.today():
+        if data_desbloqueio is not None and data_desbloqueio <= date.today():
+            cursor.execute("UPDATE Usuario SET bloqueado = FALSE WHERE nome = %s", (linha[0],))
+            conn.commit()
+        else:
             motivo = linha[4] or "Sem motivo informado."
             desbloqueio_str = str(data_desbloqueio) if data_desbloqueio else "indefinido"
             raise HTTPException(

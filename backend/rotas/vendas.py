@@ -23,18 +23,21 @@ def registrarVenda(dados: DadosVenda, role=requer_role("admin", "caixa"), nome_a
     for item in dados.itens:
         if item.quantidade <= 0:
             raise HTTPException(status_code=400, detail=f"Quantidade inválida para '{item.nome_prod}'.")
-        cursor.execute("SELECT nome, qtd, preco FROM Produto WHERE cod_prod = %s", (item.cod_prod,))
+        cursor.execute("SELECT nome, qtd, preco FROM Produto WHERE cod_prod = %s FOR UPDATE", (item.cod_prod,))
         linha = cursor.fetchone()
         if linha is None:
             raise HTTPException(status_code=404, detail=f"Produto {item.cod_prod} não encontrado.")
         if item.quantidade > linha[1]:
             raise HTTPException(status_code=400, detail=f"Estoque insuficiente para '{linha[0]}'.")
-        item_subtotal = round(item.preco_unitario * item.quantidade, 2)
+        preco_db = float(linha[2] or 0)
+        item_subtotal = round(preco_db * item.quantidade, 2)
         subtotal += item_subtotal
-        itens_validados.append((item, linha[1], item_subtotal))
+        itens_validados.append((item, linha[1], item_subtotal, linha[0], preco_db))
 
     subtotal = round(subtotal, 2)
-    total = round(max(0.0, subtotal - dados.desconto), 2)
+    if dados.desconto > subtotal:
+        raise HTTPException(status_code=400, detail="Desconto não pode ser maior que o subtotal.")
+    total = round(subtotal - dados.desconto, 2)
 
     try:
         cursor.execute(
@@ -43,7 +46,7 @@ def registrarVenda(dados: DadosVenda, role=requer_role("admin", "caixa"), nome_a
         )
         venda_id = cursor.fetchone()[0]
 
-        for item, qtd_atual, item_subtotal in itens_validados:
+        for item, qtd_atual, item_subtotal, nome_db, preco_db in itens_validados:
             nova_qtd = qtd_atual - item.quantidade
             cursor.execute("UPDATE Produto SET qtd = %s WHERE cod_prod = %s", (nova_qtd, item.cod_prod))
             cursor.execute(
@@ -52,7 +55,7 @@ def registrarVenda(dados: DadosVenda, role=requer_role("admin", "caixa"), nome_a
             )
             cursor.execute(
                 "INSERT INTO ItemVenda(venda_id, cod_prod, nome_prod, quantidade, preco_unitario, subtotal) VALUES (%s, %s, %s, %s, %s, %s)",
-                (venda_id, item.cod_prod, item.nome_prod, item.quantidade, item.preco_unitario, item_subtotal)
+                (venda_id, item.cod_prod, nome_db, item.quantidade, preco_db, item_subtotal)
             )
 
         conn.commit()

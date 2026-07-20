@@ -100,7 +100,8 @@ function VendaTab({ session }) {
   )
 
   const subtotal = carrinho.reduce((s, item) => s + item.preco * item.quantidade, 0)
-  const descontoNum = Math.max(0, Math.min(subtotal, Number(desconto) || 0))
+  const descontoVal = Number(desconto.replace(',', '.'))
+  const descontoNum = Math.max(0, Math.min(subtotal, Number.isFinite(descontoVal) ? descontoVal : 0))
   const total = Math.max(0, subtotal - descontoNum)
 
   function adicionarItem(produto) {

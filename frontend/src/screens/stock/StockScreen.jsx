@@ -377,6 +377,9 @@ function MovementTab({ session }) {
       }, session.role, session.name)
       setFeedback({ text: data.message, ok: true })
       setQty("")
+      api("/produtos", "GET", null, session.role)
+        .then(d => setProducts(d.produtos || []))
+        .catch(() => {})
     } catch (e) {
       setFeedback({ text: e.message, ok: false })
     } finally {
@@ -477,6 +480,11 @@ function HistoryTab({ session }) {
   function handleLimpar() {
     setFiltCod(""); setFiltUsuario(""); setFiltTipo("")
     setFiltDataInicio(""); setFiltDataFim(""); setPagina(1)
+    setLoading(true)
+    api(`/movimentacoes?pagina=1&por_pagina=${POR_PAGINA}`, "GET", null, session.role)
+      .then(data => { setMovements(data.movimentacoes || []); setTotal(data.total || 0) })
+      .catch(() => { setMovements([]); setTotal(0) })
+      .finally(() => setLoading(false))
   }
 
   const totalPaginas = Math.ceil(total / POR_PAGINA)
