@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 import time
 from datetime import datetime, timezone
 import backend.db  # noqa: F401 — triggers database initialization
