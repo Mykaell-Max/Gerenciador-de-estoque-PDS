@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+select {
+  cursor: pointer;
+}
+
 #root {
   width: 100%;
   max-width: 100%;
@@ -8,4 +20,20 @@
   border: none;
   min-height: 100svh;
   display: block;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #comprovante-print,
+  #comprovante-print * {
+    visibility: visible;
+  }
+  #comprovante-print {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
 }

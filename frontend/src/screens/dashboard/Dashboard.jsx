@@ -40,7 +40,7 @@ export default function Dashboard({ session, onLogout }) {
         <main className="flex-1 p-4 sm:p-6 overflow-auto">
           {activeTab === "dashboard" && <DashboardScreen session={session} onNavigate={navigate} />}
           {activeTab === "estoque"   && canAccess(session.role, "estoque")   && <StockScreen session={session} />}
-          {activeTab === "caixa"     && canAccess(session.role, "caixa")     && <CashierScreen />}
+          {activeTab === "caixa"     && canAccess(session.role, "caixa")     && <CashierScreen session={session} />}
           {activeTab === "usuarios"  && canAccess(session.role, "usuarios")  && <UsersScreen session={session} />}
           {activeTab === "logs"      && canAccess(session.role, "logs")      && <LogsScreen session={session} />}
         </main>
