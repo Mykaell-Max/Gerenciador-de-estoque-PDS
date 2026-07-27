@@ -33,6 +33,7 @@ app.include_router(vendas.router)
 app.include_router(dashboard.router)
 
 
+@app.head("/health")
 @app.get("/health")
 def health():
     uptime_seconds = int(time.time() - _start_time)
