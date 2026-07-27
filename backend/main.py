@@ -13,7 +13,7 @@ app = FastAPI()
 
 _start_time = time.time()
 
-_default_origins = "http://localhost:5173,http://localhost:5174"
+_default_origins = "http://localhost:5173,http://localhost:5174,https://gerenciador-de-estoque-pds.vercel.app"
 _origins = os.getenv("ALLOWED_ORIGINS", _default_origins).split(",")
 
 app.add_middleware(
