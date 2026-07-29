@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "https://gerenciador-de-estoque-pds.onrender.com"
+const BASE_URL = import.meta.env.VITE_API_URL || "https://gerenciador-de-estoque-pds-k4ou.onrender.com"
 
 export async function api(path, method = "GET", body = null, role = null, name = null) {
   const headers = { "Content-Type": "application/json" }
