@@ -111,9 +111,9 @@ Configuração inicial do repositório, estrutura de pastas (frontend/backend), 
 - **Portabilidade/Configuração:** URL da API e origens permitidas de CORS devem ser configuráveis via variáveis de ambiente (`.env`), não fixas no código.
 - **Usabilidade/Responsividade:** a interface deve se adaptar a telas menores (existe um componente de menu para dispositivos móveis, `MobileDrawer.jsx`).
 - **Persistência:** os dados devem ser armazenados em um banco de dados relacional (PostgreSQL).
-- <!-- PLACEHOLDER: requisito de desempenho (ex: tempo de resposta esperado da API) -->
-- <!-- PLACEHOLDER: requisito de disponibilidade/hospedagem (onde o sistema está hospedado em produção?) -->
-- <!-- PLACEHOLDER: requisitos de compatibilidade de navegador/dispositivo -->
+- **Desempenho:** o sistema deve permitir que os usuários realizem suas operações sem atrasos perceptíveis no uso cotidiano. Por se tratar de um sistema de estoque de escopo reduzido, não há requisito de alta disponibilidade ou suporte a grande volume de acessos simultâneos — os planos gratuitos da Vercel (frontend), Render (backend) e Neon (banco de dados) são suficientes para atender à demanda esperada.
+- **Disponibilidade:** o sistema está hospedado em produção na Vercel (frontend), Render (backend) e Neon (PostgreSQL), com disponibilidade condizente com os planos gratuitos dessas plataformas.
+- **Compatibilidade:** o sistema é acessível por qualquer navegador moderno (Chrome, Firefox, Edge) em dispositivos desktop e móveis, graças à interface responsiva.
 
 ---
-Veja também: [Home](Home), [Gestão do Projeto](Gestão-do-Projeto), [Análise e Projeto do Software](Análise-e-Projeto-do-Software).
+Veja também: [Home](Home), [Gestão do Projeto](Gestão-do-Projeto), [Análise e Projeto do Software](Análise-e-Projeto-do-Software), [Testes e Qualidade](Testes-e-Qualidade), [DevOps](DevOps), [Conclusão](Conclusão).

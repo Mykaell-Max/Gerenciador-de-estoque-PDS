@@ -1,6 +1,6 @@
 # Gerenciador de Estoque PDS
 
-<!-- PLACEHOLDER: adicione aqui a logo do sistema (ex: ![Logo](./images/logo.png)) -->
+![Logo](images/logo.png)
 
 ## O que é o sistema
 
@@ -18,12 +18,9 @@ O sistema é composto por um frontend em React (Vite + Tailwind CSS) e uma API b
 
 ## Motivação
 
-<!-- PLACEHOLDER: escreva aqui, em 1-2 parágrafos, por que o grupo escolheu desenvolver este software.
-Sugestões de pontos a cobrir:
-- Por que um sistema de gestão de estoque para supermercados (problema real, familiaridade com o domínio, etc.)?
-- O que motivou tecnicamente (aprender FastAPI + React, praticar RBAC, praticar Scrum, etc.)?
-- Alguma experiência pessoal/profissional que inspirou o tema?
--->
+A escolha do tema foi influenciada pela experiência prática de um dos membros do grupo, que já havia trabalhado profissionalmente com um sistema de gestão de estoque. Esse contato direto com o domínio permitiu ao grupo entender de forma realista quais funcionalidades são essenciais em um sistema desse tipo, tornando o levantamento de requisitos mais assertivo e fundamentado em necessidades reais.
+
+O recorte para supermercados foi deliberado: o modelo de negócio de um supermercado envolve múltiplos perfis de usuário com responsabilidades distintas (administração, operação de estoque e caixa), o que tornava o projeto um desafio consistente e adequado para praticar controle de acesso baseado em papéis (RBAC) — um dos conceitos centrais da disciplina. Ao mesmo tempo, o escopo permanecia gerenciável dentro do tempo disponível, permitindo que o grupo se concentrasse na qualidade da implementação e na aplicação da metodologia Scrum, em vez de lidar com um domínio excessivamente complexo.
 
 ## Telas do sistema
 
@@ -70,4 +67,4 @@ Sugestões de pontos a cobrir:
 | Caixa | Dashboard, Caixa |
 
 ---
-Veja também: [Requisitos](Requisitos), [Gestão do Projeto](Gestão-do-Projeto), [Análise e Projeto do Software](Análise-e-Projeto-do-Software).
+Veja também: [Requisitos](Requisitos), [Gestão do Projeto](Gestão-do-Projeto), [Análise e Projeto do Software](Análise-e-Projeto-do-Software), [Testes e Qualidade](Testes-e-Qualidade), [DevOps](DevOps), [Conclusão](Conclusão).

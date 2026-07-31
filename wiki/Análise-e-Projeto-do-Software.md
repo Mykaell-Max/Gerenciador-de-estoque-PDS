@@ -277,7 +277,7 @@ sequenceDiagram
 
 ## Implantação
 
-<!-- PLACEHOLDER: confirme onde cada parte está hospedada em produção. Indícios encontrados no código: frontend/src/services/api.js aponta por padrão para "https://gerenciador-de-estoque-pds.onrender.com" (Render); há um Procfile na raiz do projeto, típico de plataformas como Render/Heroku. Falta confirmar onde o frontend (build estático) e o PostgreSQL estão hospedados. -->
+O sistema está hospedado em três serviços em nuvem, integrados ao GitHub para deploy automático a cada push na branch `main`. Veja a descrição completa do processo em [DevOps](DevOps).
 
 ### Diagrama de Implantação
 
@@ -287,7 +287,7 @@ flowchart LR
         Browser["«execution environment» Navegador"]
     end
 
-    subgraph HostFE["«server» PLACEHOLDER: host do frontend"]
+    subgraph HostFE["«server» Vercel (CDN)"]
         FEArtifact["«artifact» build estático\n(Vite - npm run build)"]
     end
 
@@ -295,14 +295,14 @@ flowchart LR
         BEArtifact["«artifact» API FastAPI\n(uvicorn, via Procfile)"]
     end
 
-    subgraph HostDB["«server» PLACEHOLDER: host do PostgreSQL"]
-        DBArtifact[("«database» PostgreSQL")]
+    subgraph HostDB["«server» Neon"]
+        DBArtifact[("«database» PostgreSQL serverless")]
     end
 
     Browser -- "HTTPS" --> FEArtifact
     Browser -- "HTTPS / JSON\nx-user-role, x-user-name" --> BEArtifact
-    BEArtifact -- "TCP 5432\npsycopg2" --> DBArtifact
+    BEArtifact -- "SSL / psycopg2" --> DBArtifact
 ```
 
 ---
-Veja também: [Home](Home), [Requisitos](Requisitos), [Gestão do Projeto](Gestão-do-Projeto).
+Veja também: [Home](Home), [Requisitos](Requisitos), [Gestão do Projeto](Gestão-do-Projeto), [Testes e Qualidade](Testes-e-Qualidade), [DevOps](DevOps), [Conclusão](Conclusão).

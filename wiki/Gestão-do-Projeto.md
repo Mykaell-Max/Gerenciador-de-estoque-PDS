@@ -11,12 +11,7 @@ O desenvolvimento seguiu o processo **Scrum**, organizado em 4 sprints e gerenci
 
 As sprints tiveram, em geral, duração de uma semana, exceto a última, encurtada propositalmente. Houve intervalos sem sprint ativa entre a Sprint 2 e a 3 (09 a 10/07) e entre a 3 e a 4 (19/07).
 
-<!-- PLACEHOLDER: complemente com:
-- Motivo dos intervalos entre sprints (feriado, período de provas, etc.)
-- Como as histórias eram priorizadas e refinadas (Backlog Grooming/Refinement)
-- Ferramentas usadas além do Jira para comunicação (Discord/WhatsApp, etc.)
-- Definition of Done adotada pelo grupo
--->
+As ferramentas de comunicação utilizadas pelo grupo foram **WhatsApp** e **Discord**, tanto para alinhamentos rápidos quanto para sessões de trabalho remoto conjunto (pair programming).
 
 ## Papéis da equipe
 
@@ -56,7 +51,10 @@ As sprints tiveram, em geral, duração de uma semana, exceto a última, encurta
   Os burndowns das sprints 1, 2 e 4 mostram o trabalho concentrado nos últimos dias (pontos entram tarde, geralmente perto do fim do período), em vez de uma queda gradual, o que indica que a estimativa/registro de pontos no Jira aconteceu perto da entrega, não durante a execução. A Sprint 3 aparece zerada no burndown apesar de ter concluído 58 pontos no relatório de velocidade, provavelmente por falta de estimativa de pontos lançada nas histórias durante aquela sprint específica.
   <!-- PLACEHOLDER: confirme com o grupo se esse padrão reflete como vocês de fato trabalhavam (estimativas feitas no fechamento da sprint). Vale mencionar isso na metodologia se for o caso. -->
 
-- **Cerimônias realizadas:** <!-- PLACEHOLDER: o Jira não tem registro formal de Daily/Planning/Review além do objetivo de cada sprint (acima). Descreva aqui a periodicidade e o formato (presencial/remoto) que o grupo realmente praticou. -->
+- **Cerimônias realizadas:**
+  - **Sprint Planning:** realizada em poucas sprints, de forma remota via Discord. O grupo definia quais histórias do backlog seriam desenvolvidas e as tarefas associadas a cada uma.
+  - **Daily Scrum:** não foi adotada formalmente. O acompanhamento do progresso acontecia de forma assíncrona pelo grupo do WhatsApp, onde cada membro compartilhava o que havia feito e o que estava planejando. Quando necessário, o grupo realizava sessões de pair programming via Discord.
+  - **Sprint Review / Retrospectiva:** não foram realizadas formalmente. Ao fim de cada sprint, o grupo alinhava pelo WhatsApp o que havia sido desenvolvido e coordenava a gravação e envio do vídeo de entrega no Teams.
 
 ## Transbordos de tarefas
 
@@ -70,7 +68,7 @@ Isso não é um transbordo típico (história que estoura o prazo de uma sprint 
 
 **Backlog inicial (planejado):**
 
-<!-- PLACEHOLDER: liste aqui as histórias que o grupo planejou entregar no início do projeto (print do backlog do Jira antes do início da Sprint 2, por exemplo). -->
+O backlog inicial foi construído durante a Sprint 1 (22/06 a 29/06/2026), com foco em identificar as principais necessidades do sistema a partir do domínio de gestão de estoque de supermercado. As histórias foram escritas e organizadas no Jira antes do início da Sprint 2, cobrindo os três perfis de usuário definidos (Administrador, Estoque e Caixa) e suas respectivas responsabilidades no sistema.
 
 **Backlog final (executado):**
 
@@ -78,7 +76,7 @@ Das histórias efetivamente trabalhadas ao longo das 4 sprints, **todas as 12 hi
 
 - Como administrador, quero bloquear usuários temporariamente para evitar uso indevido. `SCRUM-9`, status "A Fazer", sem sprint. *(tecnicamente implementada no código, mas nunca movida no Jira; ver [Requisitos](Requisitos) e a seção de transbordos acima)*
 
-<!-- PLACEHOLDER: discuta se o que foi planejado inicialmente foi totalmente executado, e se novas histórias surgiram ao longo do projeto que não estavam no escopo original (ex.: dashboard com KPIs e gráficos, emissão de comprovante, filtros de histórico de movimentação, que parecem ter sido adicionadas nas sprints 3 e 4; confirme se já estavam no backlog inicial ou se foram incluídas depois). -->
+De forma geral, o que foi planejado no backlog inicial foi executado ao longo das quatro sprints. A única história que permanece formalmente pendente no Jira é o bloqueio de usuários (`SCRUM-9`), que — como descrito na seção de transbordos — foi implementada no código fora do fluxo rastreado.
 
 ---
-Veja também: [Home](Home), [Requisitos](Requisitos), [Análise e Projeto do Software](Análise-e-Projeto-do-Software).
+Veja também: [Home](Home), [Requisitos](Requisitos), [Análise e Projeto do Software](Análise-e-Projeto-do-Software), [Testes e Qualidade](Testes-e-Qualidade), [DevOps](DevOps), [Conclusão](Conclusão).

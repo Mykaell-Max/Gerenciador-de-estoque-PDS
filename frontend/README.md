@@ -1,16 +1,52 @@
-# React + Vite
+# Frontend – Gerenciador de Estoque PDS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface web do sistema de gestão de estoque, desenvolvida em React 19 com Vite e Tailwind CSS.
 
-Currently, two official plugins are available:
+> Para executar o sistema completo (frontend + backend), use os scripts na raiz do repositório. Consulte o [README principal](../README.md).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tecnologias
 
-## React Compiler
+- [React 19](https://react.dev/)
+- [Vite](https://vite.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Pré-requisitos
 
-## Expanding the ESLint configuration
+- [Node.js 18+](https://nodejs.org/)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Instalação
+
+```bash
+npm install
+```
+
+## Scripts
+
+| Comando | Descrição |
+|---|---|
+| `npm run dev` | Inicia o servidor de desenvolvimento em `http://localhost:5173` |
+| `npm run build` | Gera o build de produção em `dist/` |
+| `npm run preview` | Pré-visualiza o build de produção localmente |
+| `npm run lint` | Executa o ESLint |
+
+## Configuração da API
+
+A URL da API é definida pela variável de ambiente `VITE_API_URL`.
+Se não definida, o frontend aponta para a API em produção (`https://gerenciador-de-estoque-pds.onrender.com`).
+
+Para usar uma API local, crie um arquivo `.env` na raiz desta pasta:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+## Telas e perfis de acesso
+
+| Tela | Administrador | Estoque | Caixa |
+|---|:---:|:---:|:---:|
+| Login / Cadastro | ✅ | ✅ | ✅ |
+| Dashboard | ✅ | ✅ | ✅ |
+| Estoque | ✅ | ✅ | ❌ |
+| Caixa | ✅ | ❌ | ✅ |
+| Usuários | ✅ | ❌ | ❌ |
+| Logs de auditoria | ✅ | ❌ | ❌ |
