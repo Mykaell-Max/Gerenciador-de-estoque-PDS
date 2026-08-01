@@ -277,7 +277,7 @@ sequenceDiagram
 
 ## Implantação
 
-<!-- PLACEHOLDER: confirme onde cada parte está hospedada em produção. Indícios encontrados no código: frontend/src/services/api.js aponta por padrão para "https://gerenciador-de-estoque-pds.onrender.com" (Render); há um Procfile na raiz do projeto, típico de plataformas como Render/Heroku. Falta confirmar onde o frontend (build estático) e o PostgreSQL estão hospedados. -->
+O sistema está implantado em três serviços gerenciados separados: o frontend (build estático gerado pelo Vite) na **Vercel**; a API FastAPI na **Render**, executada via `uvicorn` a partir do `Procfile` da raiz do projeto; e o banco **PostgreSQL** no **Neon**. A comunicação entre backend e banco usa a variável de ambiente `DATABASE_URL` (ver `conexao.py`), padrão de bancos gerenciados na nuvem.
 
 ### Diagrama de Implantação
 
@@ -287,7 +287,7 @@ flowchart LR
         Browser["«execution environment» Navegador"]
     end
 
-    subgraph HostFE["«server» PLACEHOLDER: host do frontend"]
+    subgraph HostFE["«server» Vercel"]
         FEArtifact["«artifact» build estático\n(Vite - npm run build)"]
     end
 
@@ -295,13 +295,13 @@ flowchart LR
         BEArtifact["«artifact» API FastAPI\n(uvicorn, via Procfile)"]
     end
 
-    subgraph HostDB["«server» PLACEHOLDER: host do PostgreSQL"]
+    subgraph HostDB["«server» Neon"]
         DBArtifact[("«database» PostgreSQL")]
     end
 
     Browser -- "HTTPS" --> FEArtifact
     Browser -- "HTTPS / JSON\nx-user-role, x-user-name" --> BEArtifact
-    BEArtifact -- "TCP 5432\npsycopg2" --> DBArtifact
+    BEArtifact -- "TCP 5432\npsycopg2 (DATABASE_URL)" --> DBArtifact
 ```
 
 ---

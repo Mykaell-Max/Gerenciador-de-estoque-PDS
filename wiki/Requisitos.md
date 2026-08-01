@@ -112,7 +112,7 @@ Configuração inicial do repositório, estrutura de pastas (frontend/backend), 
 - **Usabilidade/Responsividade:** a interface deve se adaptar a telas menores (existe um componente de menu para dispositivos móveis, `MobileDrawer.jsx`).
 - **Persistência:** os dados devem ser armazenados em um banco de dados relacional (PostgreSQL).
 - <!-- PLACEHOLDER: requisito de desempenho (ex: tempo de resposta esperado da API) -->
-- <!-- PLACEHOLDER: requisito de disponibilidade/hospedagem (onde o sistema está hospedado em produção?) -->
+- **Disponibilidade/Hospedagem:** o sistema roda em serviços gerenciados na nuvem — frontend na Vercel, API na Render e banco PostgreSQL no Neon (ver [Implantação](Análise-e-Projeto-do-Software#implantação)) — sem depender de infraestrutura própria.
 - <!-- PLACEHOLDER: requisitos de compatibilidade de navegador/dispositivo -->
 
 ---
